@@ -1,19 +1,20 @@
 package com.ownedoutcomes.asset
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import ktx.assets.loadOnDemand
 import ktx.style.*
 
-fun loadSkin() = skin(atlas = loadOnDemand<TextureAtlas>(path = "skin.atlas").asset) {
+fun loadSkin(assetManager: AssetManager) = skin(atlas = assetManager.loadOnDemand<TextureAtlas>(path = "skin.atlas").asset) {
     val bitmapFont = BitmapFont(Gdx.files.internal("font-export.fnt"), getRegion("font-export"), false)
     textButton("play-button") {
         font = bitmapFont
-        up = getDrawable("button")
-        over = getDrawable("button-pressed")
-        down = getDrawable("button-pressed")
+        up = it.getDrawable("button")
+        over = it.getDrawable("button-pressed")
+        down = it.getDrawable("button-pressed")
     }
 
     window("game-over") {
@@ -22,9 +23,9 @@ fun loadSkin() = skin(atlas = loadOnDemand<TextureAtlas>(path = "skin.atlas").as
 
     textButton("game-over-button") {
         font = bitmapFont
-        up = getDrawable("button")
-        over = getDrawable("button-pressed")
-        down = getDrawable("button-pressed")
+        up = it.getDrawable("button")
+        over = it.getDrawable("button-pressed")
+        down = it.getDrawable("button-pressed")
     }
 
     label("game-over") {
@@ -36,16 +37,16 @@ fun loadSkin() = skin(atlas = loadOnDemand<TextureAtlas>(path = "skin.atlas").as
     }
 
     button("start") {
-        up = getDrawable("start-up")
-        over = getDrawable("start-over")
-        down = getDrawable("start-down")
+        up = it.getDrawable("start-up")
+        over = it.getDrawable("start-over")
+        down = it.getDrawable("start-down")
     }
 
     button("to-menu") {
-        up = getDrawable("to-menu")
+        up = it.getDrawable("to-menu")
     }
 
     button("play-again") {
-        up = getDrawable("play-again")
+        up = it.getDrawable("play-again")
     }
 }

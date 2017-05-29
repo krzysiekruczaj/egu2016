@@ -41,8 +41,8 @@ class GameRenderer(val gameController: GameController, val batch: Batch, skin: S
     val textureEnemyAttackRegion3 = TextureRegion(enemyAttackSprite3)
 
 
-    val eatingPlayers = gdxMapOf<Player, Animation>()
-    val eatingFoods = gdxMapOf<Food, Animation>()
+    val eatingPlayers = gdxMapOf<Player, Animation<TextureRegion>>()
+    val eatingFoods = gdxMapOf<Food, Animation<TextureRegion>>()
 
     init {
         playerSprite.setOriginCenter()

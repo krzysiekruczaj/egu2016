@@ -1,9 +1,9 @@
 package com.ownedoutcomes.logic
 
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.viewport.FitViewport
@@ -12,11 +12,11 @@ import com.ownedoutcomes.Runner
 import com.ownedoutcomes.logic.entity.*
 import com.ownedoutcomes.view.GameOver
 import com.ownedoutcomes.view.NextLevel
-import ktx.assets.asset
+import ktx.assets.getAsset
 import ktx.collections.gdxSetOf
 import ktx.collections.isEmpty
 import ktx.collections.isNotEmpty
-import ktx.inject.inject
+import ktx.inject.Context
 import ktx.math.vec2
 import java.util.concurrent.ThreadLocalRandom
 
@@ -28,7 +28,10 @@ val halfGameWorldHeight = gameWorldHeight / 2f
 var currentGamePoints = 0
 var currentGameLevel = 1
 
-class GameController {
+class GameController(val context: Context, val assetManager: AssetManager) {
+
+
+
     val gameViewport: Viewport = FitViewport(gameWorldWidth, gameWorldHeight)
     private val inputController = InputController(gameViewport)
     private lateinit var world: World
@@ -173,7 +176,7 @@ class GameController {
             while (playersToAdd-- > 0) {
                 players.add(Player(world, inputController, center).initiate())
             }
-            asset<Sound>("newPlayer.wav").play()
+            assetManager.getAsset<Sound>("newPlayer.wav").play()
             playersToAdd = 0
         }
     }
@@ -190,11 +193,11 @@ class GameController {
                 }
 
                 players.remove(it)
-                asset<Sound>("kill.wav").play()
+                assetManager.getAsset<Sound>("kill.wav").play()
             }
             playersToRemove.clear()
             if (players.isEmpty()) {
-                inject<Runner>().setCurrentView(inject<GameOver>())
+                context.inject<Runner>().setCurrentView(context, context.inject<GameOver>())
             }
         }
     }
@@ -213,7 +216,7 @@ class GameController {
             foodToRemove.forEach {
                 world.destroyBody(it.body)
                 food.remove(it)
-                asset<Sound>("burp.wav").play()
+                assetManager.getAsset<Sound>("burp.wav").play()
             }
             foodToRemove.clear()
         }
@@ -263,7 +266,7 @@ class GameController {
 
     private fun moveToNextLevel() {
         currentGameLevel++
-        inject<Runner>().setCurrentView(inject<NextLevel>())
+        context.inject<Runner>().setCurrentView(context, context.inject<NextLevel>())
     }
 
 

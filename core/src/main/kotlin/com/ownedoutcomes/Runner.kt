@@ -2,6 +2,7 @@ package com.ownedoutcomes
 
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -16,8 +17,7 @@ import com.ownedoutcomes.view.*
 import ktx.app.KotlinApplication
 import ktx.app.LetterboxingViewport
 import ktx.assets.loadOnDemand
-import ktx.inject.inject
-import ktx.inject.register
+import ktx.inject.Context
 import ktx.scene2d.Scene2DSkin
 
 class Runner : KotlinApplication() {
@@ -25,20 +25,22 @@ class Runner : KotlinApplication() {
 
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG
+        val context = Context()
+        val assetManager = AssetManager()
         val viewport: Viewport = LetterboxingViewport(targetPpiX = 96f, targetPpiY = 96f, aspectRatio = 4f / 3f)
         val batch = SpriteBatch()
         val stage = Stage(viewport, batch)
-        val skin = loadSkin()
+        val skin = loadSkin(assetManager)
         Scene2DSkin.defaultSkin = skin
-        val menuView = Menu(stage)
-        val nextLevelView = NextLevel(stage)
-        val gameController = GameController()
+        val menuView = Menu(context, assetManager, stage)
+        val nextLevelView = NextLevel(context, stage)
+        val gameController = GameController(assetManager = assetManager, context = context)
         val runner = this
         val renderer = GameRenderer(gameController, batch, skin)
         val gameView = Game(stage, gameController, renderer)
 
         view = menuView
-        register {
+        context.register {
             bindSingleton(runner)
             bindSingleton(skin)
             bindSingleton(batch)
@@ -47,13 +49,13 @@ class Runner : KotlinApplication() {
             bindSingleton(gameView)
             bindSingleton(gameController)
             bindSingleton(renderer)
-            bindSingleton(GameOver(stage))
+            bindSingleton(GameOver(context, stage))
             bindSingleton(nextLevelView)
         }
 
-        loadSounds()
-        loadMusic()
-        playMusic()
+        loadSounds(assetManager)
+        loadMusic(assetManager)
+        playMusic(assetManager)
 
         Gdx.input.inputProcessor = stage
         stage.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.5f)))
@@ -68,14 +70,14 @@ class Runner : KotlinApplication() {
         view.render(delta)
     }
 
-    fun loadSounds() {
+    fun loadSounds(assetManager: AssetManager) {
         arrayOf("kill.wav", "newPlayer.wav", "burp.wav").forEach {
-            loadOnDemand<Sound>(it).asset
+            assetManager.loadOnDemand<Sound>(it).asset
         }
     }
 
-    fun setCurrentView(nextView: View) {
-        inject<Stage>().addAction(Actions.sequence(
+    fun setCurrentView(context:Context, nextView: View) {
+        context.inject<Stage>().addAction(Actions.sequence(
                 Actions.fadeOut(0.5f),
                 Actions.run {
                     view.hide()

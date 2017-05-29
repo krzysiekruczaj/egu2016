@@ -1,8 +1,9 @@
 package com.ownedoutcomes.music
 
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.math.MathUtils
-import ktx.assets.asset
+import ktx.assets.getAsset
 import ktx.assets.loadOnDemand
 
 enum class Theme(val id: String, val volumeModifier: Float) {
@@ -12,11 +13,11 @@ enum class Theme(val id: String, val volumeModifier: Float) {
     _3("music/unfinishedBusiness.ogg", 0.25f),
 }
 
-fun playMusic() {
+fun playMusic(assetManager: AssetManager) {
     val theme = randomTheme()
-    val music = asset<Music>(theme.id);
+    val music = assetManager.getAsset<Music>(theme.id)
     music.setOnCompletionListener {
-        playMusic()
+        playMusic(assetManager)
     }
     music.volume = theme.volumeModifier * 0.5f
     music.play()
@@ -24,6 +25,6 @@ fun playMusic() {
 
 private fun randomTheme() = Theme.values()[MathUtils.random(0, Theme.values().size - 1)]
 
-fun loadMusic() {
-    Theme.values().forEach { loadOnDemand<Music>(it.id).asset }
+fun loadMusic(assetManager: AssetManager) {
+    Theme.values().forEach { assetManager.loadOnDemand<Music>(it.id).asset }
 }

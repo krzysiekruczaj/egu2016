@@ -1,9 +1,9 @@
 package com.ownedoutcomes.view
 
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
@@ -15,26 +15,29 @@ import ktx.actors.onChange
 import ktx.actors.onClick
 import ktx.assets.getValue
 import ktx.assets.loadOnDemand
-import ktx.inject.inject
-import ktx.scene2d.*
+import ktx.inject.Context
+import ktx.scene2d.button
+import ktx.scene2d.label
+import ktx.scene2d.table
+import ktx.scene2d.textButton
 
-class Menu(stage: Stage) : AbstractView(stage) {
-    val backgroundImage by loadOnDemand<Texture>(path = "menu-background.png")
+class Menu(context: Context, assetManager: AssetManager, stage: Stage) : AbstractView(stage) {
+    val backgroundImage by assetManager.loadOnDemand<Texture>(path = "menu-background.png")
     override val root = table {
         setFillParent(true)
         backgroundImage.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         background = TextureRegionDrawable(TextureRegion(backgroundImage, 0, 0, 1000, 750))
         button(style = "start") { cell ->
             onChange { event, button ->
-                inject<GameController>().reload()
-                inject<Runner>().setCurrentView(inject<Game>())
+                context.inject<GameController>().reload()
+                context.inject<Runner>().setCurrentView(context, context.inject<Game>())
             }
             cell.expand().pad(100f).align(Align.bottomLeft)
         }
     }
 }
 
-class GameOver(stage: Stage) : AbstractView(stage) {
+class GameOver(context: Context, stage: Stage) : AbstractView(stage) {
     override val root = table {
         background = skin.getDrawable("gameover")
         setFillParent(true)
@@ -43,14 +46,14 @@ class GameOver(stage: Stage) : AbstractView(stage) {
             defaults().pad(40f)
             button(style = "play-again") { cell ->
                 onClick { event, button ->
-                    inject<GameController>().reload()
-                    inject<Runner>().setCurrentView(inject<Game>())
+                    context.inject<GameController>().reload()
+                    context.inject<Runner>().setCurrentView(context, context.inject<Game>())
                 }
             }
             this.row()
             button(style = "to-menu") { cell ->
                 onClick { event, button ->
-                    inject<Runner>().setCurrentView(inject<Menu>())
+                    context.inject<Runner>().setCurrentView(context, context.inject<Menu>())
                 }
             }
         }
@@ -63,7 +66,7 @@ class GameOver(stage: Stage) : AbstractView(stage) {
     }
 }
 
-class NextLevel(stage: Stage) : AbstractView(stage) {
+class NextLevel(context: Context, stage: Stage) : AbstractView(stage) {
     override val root = table {
         background = skin.getDrawable("background0")
         setFillParent(true)
@@ -75,8 +78,8 @@ class NextLevel(stage: Stage) : AbstractView(stage) {
             pad(25f)
             color = Color.FIREBRICK
             onClick { event, button ->
-                inject<GameController>().reload()
-                inject<Runner>().setCurrentView(inject<Game>())
+                context.inject<GameController>().reload()
+                context.inject<Runner>().setCurrentView(context, context.inject<Game>())
             }
             cell.padTop(15f)
         }
